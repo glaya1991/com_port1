@@ -4,6 +4,7 @@ import sys
 import string  # , keyboard
 from os import terminal_size
 
+import serial.tools.list_ports
 import serial
 import time
 import os
@@ -183,6 +184,13 @@ def modbus_func():
 
         else:
             print(out, end=' ')
+
+        res = crc16_modbus.CRC16(out, n-2)
+        if (res == (out[-1]+out[-2]*256)):
+            print("__OK__", end = ' ')
+        else:
+            print("__!!! FAIL !!!__", end = ' ')
+
         print("")
     else:
         print('Wrong request')
@@ -272,6 +280,13 @@ def modbus_func2(id, func, addr, num, data0):
 
             else:
                 print(out, end=' ')
+
+            res = crc16_modbus.CRC16(out, n - 2)
+            if (res == (out[-1] + out[-2] * 256)):
+                print("__OK__", end=' ')
+            else:
+                print("__!!! FAIL !!!__", end=' ')
+
             print("")
     return
 
@@ -293,6 +308,10 @@ dict_mode = {'1': 'hex', '2': 'dec', '3': 'sym'}
 tdelay = 0.001
 _wr_en = 0
 
+# available com ports
+comlist = serial.tools.list_ports.comports()
+for port, desc, hwid in sorted(comlist):
+    print("{}: {} [{}]".format(port, desc, hwid))
 
 # ----- Set serial port parametrs ----- #
 
@@ -484,21 +503,5 @@ if test_en:
 global_ch_exit = 0  # flag exit: if 1 - exit programm!
 
 while global_ch_exit == 0:
-    '''
-	# get keyboard input
-    if keyboard.is_pressed('q'): 
-        print('pressed')
-        exit()
-    '''
-
-    '''
-    # different modes
-    if prog_mode=='1':
-        receive_only_func()
-    if prog_mode=='2':
-        send_receive_func()
-    '''
-
     modbus_func()
 
-# time.sleep(1)
