@@ -170,24 +170,6 @@ def modbus_func():
         #print(n)
 
     n = len(out)
-    '''
-    n = ser.in_waiting
-    print(n)
-    if n < N_TX:
-        for i in range(10):
-            time.sleep(tdelay)
-            n = ser.in_waiting
-            print(n)
-            if n >= N_TX: break;
-
-    
-    
-    out = ''
-    n = ser.in_waiting
-    if (n != 0):
-        out = ser.read(n)
-    '''
-
     if n != 0:
         print("n={:d}: ".format(n), end=' ')
 
@@ -258,19 +240,7 @@ def modbus_func2(id, func, addr, num, data0):
     if (flag_en):
         print(''.join('{:02X} '.format(val) for val in query))
         ser.write(query)
-        '''
-        out = ''
-        n = ser.in_waiting
-        if n < N_TX:
-            for i in range(10):
-                time.sleep(tdelay)
-                n = ser.in_waiting
-                if n >= N_TX: break;
 
-        n = ser.in_waiting
-        if (n != 0):
-            out = ser.read(n)
-        '''
         n = ser.in_waiting
         delay_cnt = 0
         while n == 0 and delay_cnt < 100:
@@ -321,16 +291,8 @@ mode = 'hex'
 dict_mode = {'1': 'hex', '2': 'dec', '3': 'sym'}
 
 tdelay = 0.001
-
 _wr_en = 0
 
-'''
-arr = [0x7F, 0x03, 0x00, 0x00, 0x00, 0x02, 0, 0]
-res = crc16_modbus.CRC16(arr, 6)
-arr[6] = res>>8
-arr[7] = res&0xFF
-print(''.join('{:02X} '.format(val) for val in arr))
-'''
 
 # ----- Set serial port parametrs ----- #
 
@@ -433,21 +395,6 @@ else:  # if program has _no_ arguments in command line
     if in1 == 'q':
         exit()
 
-    # ----- Set programm mode -------------- #
-# programm modes: 1) receive only, 2) send bytes and then receive answer
-
-'''
-prog_mode_list=['1','2']
-prog_mode=input(">> mode: if 1 - receive only, if 2 - send/receive, if q - quit, if h - help: ")
-if prog_mode=='h':
-    help_func()
-    exit()
-elif prog_mode=='q': 
-    exit()
-elif (prog_mode in prog_mode_list)==False: 
-    print('Wrong mode!')
-    exit()
-'''
 
 wr_en = _wr_en
 # write rx data:
@@ -459,16 +406,7 @@ if wr_en == 1:
     file1 = open(filename, 'w')
     print(filename, '\r\n')
 
-# ----- Set hotkeys ------------------- #
-'''
-keyboard.add_hotkey('ctrl+q', exit_func)
-keyboard.add_hotkey('ctrl+w', info_func)
-'''
-'''
-print("!!! Exit - Ctrl+q !!!")
-print("!!! Info - Ctrl+w !!!")
-print("!!! Help - arg -h !!!")
-'''
+
 print('!!! Exit - Ctrl+Shift+C !!!')
 
 # ----- Open serial port -------------- #
@@ -527,7 +465,7 @@ if test_en:
     n_num = 8
     n_addr = int(Nblocks/n_num)
 
-    for cnt in range(1):
+    for cnt in range(10):
         modbus_func2(id1, 0x03, 0, Nblocks, 0)
         modbus_func2(id2, 0x03, 0, Nblocks, 0)
 
