@@ -475,8 +475,16 @@ if test_en:
 
         modbus_func2(0x7f, 0x03, 0, Nblocks, 0)
 
-# test write/read for 2 mcu
+
 test_en = 1
+if test_en:
+    Nblocks = 4
+    while True:
+        modbus_func2(0x7f, 0x03, 0, Nblocks, 0)
+        time.sleep(1)
+
+# test write/read for 2 mcu
+test_en = 0
 if test_en:
     id1 = 0x7f
     id2 = 0x1a
