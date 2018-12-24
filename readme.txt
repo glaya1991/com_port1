@@ -1,0 +1,1 @@
+Тест MODBUS (по USB-UART)
