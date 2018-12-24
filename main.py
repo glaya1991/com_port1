@@ -281,11 +281,12 @@ def modbus_func2(id, func, addr, num, data0):
             else:
                 print(out, end=' ')
 
-            res = crc16_modbus.CRC16(out, n - 2)
-            if (res == (out[-1] + out[-2] * 256)):
-                print("__OK__", end=' ')
-            else:
-                print("__!!! FAIL !!!__", end=' ')
+            if (n>2):
+                res = crc16_modbus.CRC16(out, n - 2)
+                if res == (out[-1] + out[-2] * 256):
+                    print("__OK__", end=' ')
+                else:
+                    print("__!!! FAIL !!!__", end=' ')
 
             print("")
     return
@@ -386,7 +387,11 @@ if N_arg > 1:  # if program has arguments in command line
         print("Arguments not commited"); exit()
 
 else:  # if program has _no_ arguments in command line
-    input1 = input(">> Default settings? - yes=1, no=2, q=quit, h=help\n>>")  # /dev/ttyUSB0
+
+    # !!!! UNCOMMENT ME  !!!!
+    # input1 = input(">> Default settings? - yes=1, no=2, q=quit, h=help\n>>")  # /dev/ttyUSB0
+    input1 = 1
+
     if (input1 == '2'):
         _port = input(">> Port: ")
         _baudrate = input(">> Baudrate: ")
@@ -407,7 +412,10 @@ else:  # if program has _no_ arguments in command line
     else:
         pass
 
-    in1 = input(">> Mode: HEX=1, DEC=2, SYMBOL=3, q=quit: ")
+    # !!!! UNCOMMENT ME  !!!!
+    # in1 = input(">> Mode: HEX=1, DEC=2, SYMBOL=3, q=quit: ")
+    in1 = 1
+
     mode = dict_mode.get(in1)
     if mode == None:
         mode = 'hex'
@@ -478,10 +486,19 @@ if test_en:
 
 test_en = 1
 if test_en:
-    Nblocks = 4
+    Nblocks = 1
     while True:
         modbus_func2(0x7f, 0x03, 0, Nblocks, 0)
-        time.sleep(1)
+        time.sleep(2)
+
+        # modbus_func2(0x7f, 0x03, 0, Nblocks*2, 0)
+        # time.sleep(2)
+        #
+        # modbus_func2(0x7f, 0x03, 0, Nblocks*3, 0)
+        # time.sleep(2)
+        #
+        # modbus_func2(0x7f, 0x03, 0, Nblocks*4, 0)
+        # time.sleep(2)
 
 # test write/read for 2 mcu
 test_en = 0
