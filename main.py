@@ -10,6 +10,7 @@ import time
 import os
 import crc16_modbus
 import random
+import threading
 
 
 # ----- Help function ----------------- #
@@ -153,47 +154,48 @@ def modbus_func():
     print(''.join('{:02X} '.format(val) for val in query))
     ser.write(query)
 
-    n = ser.in_waiting
-    delay_cnt = 0
-    while n==0 and delay_cnt<100:
-        n = ser.in_waiting
-        delay_cnt += 1
-        time.sleep(tdelay)
-
-    out = []
-    delay_cnt = 0
-    #print(n)
-    while(n!=0) and  delay_cnt<100:
-        out.extend(ser.read(n))
-        delay_cnt += 1
-        time.sleep(tdelay)
-        n = ser.in_waiting
-        #print(n)
-
-    n = len(out)
-    if n != 0:
-        print("n={:d}: ".format(n), end=' ')
-
-        if mode == 'hex':
-            for i in out:
-                print("{:x}".format(i), end=' ')
-
-        elif mode == 'dec':
-            for i in out:
-                print("{:d}".format(i), end=' ')
-
-        else:
-            print(out, end=' ')
-
-        res = crc16_modbus.CRC16(out, n-2)
-        if (res == (out[-1]+out[-2]*256)):
-            print("__OK__", end = ' ')
-        else:
-            print("__!!! FAIL !!!__", end = ' ')
-
-        print("")
-    else:
-        print('Wrong request')
+    # read old version -- now in thread
+    # n = ser.in_waiting
+    # delay_cnt = 0
+    # while n==0 and delay_cnt<100:
+    #     n = ser.in_waiting
+    #     delay_cnt += 1
+    #     time.sleep(tdelay)
+    #
+    # out = []
+    # delay_cnt = 0
+    # #print(n)
+    # while(n!=0) and  delay_cnt<100:
+    #     out.extend(ser.read(n))
+    #     delay_cnt += 1
+    #     time.sleep(tdelay)
+    #     n = ser.in_waiting
+    #     #print(n)
+    #
+    # n = len(out)
+    # if n != 0:
+    #     print("n={:d}: ".format(n), end=' ')
+    #
+    #     if mode == 'hex':
+    #         for i in out:
+    #             print("{:x}".format(i), end=' ')
+    #
+    #     elif mode == 'dec':
+    #         for i in out:
+    #             print("{:d}".format(i), end=' ')
+    #
+    #     else:
+    #         print(out, end=' ')
+    #
+    #     res = crc16_modbus.CRC16(out, n-2)
+    #     if (res == (out[-1]+out[-2]*256)):
+    #         print("__OK__", end = ' ')
+    #     else:
+    #         print("__!!! FAIL !!!__", end = ' ')
+    #
+    #     print("")
+    # else:
+    #     print('Wrong request')
 
     return
 
@@ -249,48 +251,109 @@ def modbus_func2(id, func, addr, num, data0):
         print(''.join('{:02X} '.format(val) for val in query))
         ser.write(query)
 
-        n = ser.in_waiting
-        delay_cnt = 0
-        while n == 0 and delay_cnt < 100:
-            n = ser.in_waiting
-            delay_cnt += 1
-            time.sleep(tdelay)
-
-        out = []
-        delay_cnt = 0
-        # print(n)
-        while (n != 0) and delay_cnt < 100:
-            out.extend(ser.read(n))
-            delay_cnt += 1
-            time.sleep(tdelay)
-            n = ser.in_waiting
-            # print(n)
-
-        n = len(out)
-        if n != 0:
-            print("n={:d}: ".format(n), end=' ')
-
-            if mode == 'hex':
-                for i in out:
-                    print("{:x}".format(i), end=' ')
-
-            elif mode == 'dec':
-                for i in out:
-                    print("{:d}".format(i), end=' ')
-
-            else:
-                print(out, end=' ')
-
-            if (n>2):
-                res = crc16_modbus.CRC16(out, n - 2)
-                if res == (out[-1] + out[-2] * 256):
-                    print("__OK__", end=' ')
-                else:
-                    print("__!!! FAIL !!!__", end=' ')
-
-            print("")
+        # read data old version^ now in thread
+        # n = ser.in_waiting
+        # delay_cnt = 0
+        # while n == 0 and delay_cnt < 100:
+        #     n = ser.in_waiting
+        #     delay_cnt += 1
+        #     time.sleep(tdelay)
+        #
+        # out = []
+        # delay_cnt = 0
+        # # print(n)
+        # while (n != 0) and delay_cnt < 100:
+        #     out.extend(ser.read(n))
+        #     delay_cnt += 1
+        #     time.sleep(tdelay)
+        #     n = ser.in_waiting
+        #     # print(n)
+        #
+        # n = len(out)
+        # if n != 0:
+        #     print("n={:d}: ".format(n), end=' ')
+        #
+        #     if mode == 'hex':
+        #         for i in out:
+        #             print("{:x}".format(i), end=' ')
+        #
+        #     elif mode == 'dec':
+        #         for i in out:
+        #             print("{:d}".format(i), end=' ')
+        #
+        #     else:
+        #         print(out, end=' ')
+        #
+        #     if (n>2):
+        #         res = crc16_modbus.CRC16(out, n - 2)
+        #         if res == (out[-1] + out[-2] * 256):
+        #             print("__OK__", end=' ')
+        #         else:
+        #             print("__!!! FAIL !!!__", end=' ')
+        #
+        #     print("")
     return
 
+def recv_msg():
+    n = ser.in_waiting
+    delay_cnt = 0
+    while n == 0 and delay_cnt < 10:
+        n = ser.in_waiting
+        delay_cnt += 1
+        time.sleep(tdelay)
+
+    out = []
+    delay_cnt = 0
+    # print(n)
+    while (n != 0) and delay_cnt < 10:
+        out.extend(ser.read(n))
+        delay_cnt += 1
+        time.sleep(tdelay)
+        n = ser.in_waiting
+        # print(n)
+
+    char_pt = ord('.')
+    n = len(out)
+    if n != 0:
+        print("n={:d}: ".format(n), end=' ')
+
+        if mode == 'hex':
+            for i in out:
+                print("{:x}".format(i), end=' ')
+
+        elif mode == 'dec':
+            for i in out:
+                print("{:d}".format(i), end=' ')
+
+        elif mode == 'sym':
+            for i in out:
+                try:
+                    if (i == 0xa) or (i == 0xd): i = char_pt  # doesn't work, if <14
+                    print(chr(i), end='')
+                except:
+                    print('x', end=' ')
+
+            print('\r\n', out, end=' ')
+
+        else:
+            print(out, end=' ')
+
+    return out
+
+def func_recv():
+    while True:
+        msg_recv = recv_msg()
+        n = len(msg_recv)
+        if (n > 2):
+            res = crc16_modbus.CRC16(msg_recv, n - 2)
+            if res == (msg_recv[-1] + msg_recv[-2] * 256):
+                print("__OK__", end=' ')
+            else:
+                print("__!!! FAIL !!!__", end=' ')
+        if(n>0):
+            print("\r\n")
+
+    return
 
 # ------------------------------------- #
 #        MAIN                           #
@@ -464,6 +527,10 @@ print(ser.name)
 n = ser.in_waiting
 out = ser.read(n)  # first read???
 
+
+thread_recv = threading.Thread(target=func_recv)
+thread_recv.start()
+
 # ----- main loop --------------------- #
 
 # test write/read
@@ -489,7 +556,8 @@ if test_en:
     Nblocks = 1
     while True:
         modbus_func2(0x7f, 0x03, 0, Nblocks, 0)
-        time.sleep(2)
+        time.sleep(0.5)
+        input("press")
 
         # modbus_func2(0x7f, 0x03, 0, Nblocks*2, 0)
         # time.sleep(2)
