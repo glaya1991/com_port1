@@ -11,9 +11,6 @@ import random
 import threading
 
 import crc16_modbus
-import gui
-
-from tkinter import END, INSERT, SEL
 
 
 # ----- Help function ----------------- #
@@ -358,15 +355,6 @@ def func_recv():
 
     return
 
-def func_read():
-    str1 = gui.memo1.get(1.0, END)
-    gui.lbl1.config(text="memo1: {0}".format(str1))
-    gui.memo1.insert(INSERT, ".end")
-    return
-
-def func_clear():
-    gui.memo1.delete(1.0, END)
-    return
 
 # ------------------------------------- #
 #        MAIN                           #
@@ -544,12 +532,6 @@ out = ser.read(n)  # first read???
 thread_recv = threading.Thread(target=func_recv)
 thread_recv.start()
 
-#print(gui.memo1.keys())
-
-gui.create_place()
-gui.btn1.config(command=func_read)
-gui.btn2.config(command=func_clear)
-gui.start()
 
 # ----- main loop --------------------- #
 
